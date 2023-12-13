@@ -1,0 +1,26 @@
+extend type Mutation {
+  sessions: SessionMutations
+}
+
+extend type Query {
+  sessions: SessionQueries
+}
+
+type SessionMutations {
+  create(input: CreateSessionInput): Session
+}
+
+type SessionQueries {
+  get(id: String!): Session
+  getInfo(id: String!): Session!
+}
+
+type Session {
+  id: String!
+  user: User
+  expiresAt: String!
+}
+
+input CreateSessionInput {
+  userId: String!
+}

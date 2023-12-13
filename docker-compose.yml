@@ -1,0 +1,47 @@
+version: "2"
+services:
+  database:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "54320:5432"
+    networks:
+      - internal
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: api
+    volumes:
+      - ".:/code"
+    ports:
+      - "4000:4000"
+    networks:
+      - internal
+      - external
+    depends_on:
+      - database
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ".:/code"
+    entrypoint: ["./scripts/migrate.sh"]
+    depends_on:
+      - database
+    networks:
+      - internal
+volumes:
+  postgres:
+networks:
+  internal:
+    driver: bridge
+  external:
+    driver: bridge
